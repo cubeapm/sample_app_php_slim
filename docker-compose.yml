@@ -1,0 +1,30 @@
+version: '3'
+services:
+  web:
+    build:
+      context: . 
+    container_name: cube_php_slim
+    environment:
+      - OTEL_PHP_AUTOLOAD_ENABLED=true
+      - OTEL_SERVICE_NAME=cube_php_slim
+      - OTEL_METRICS_EXPORTER=none
+      - OTEL_TRACES_EXPORTER=console
+      - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+      - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://localhost:4317/opentelemetry.proto.collector.trace.v1.TraceService/Export
+      - OTEL_PROPAGATORS=baggage,tracecontext
+    ports:
+      - "8000:8000"  
+  mysql:
+    image: mysql:8.0
+    container_name: cube_php_slim_mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=test
+    volumes:
+      - cube_php_slim_mysql:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+volumes:
+    cube_php_slim_mysql:
+    

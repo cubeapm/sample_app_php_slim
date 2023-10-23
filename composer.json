@@ -1,0 +1,24 @@
+{
+    
+    "require": {
+        "slim/slim": "4.*",
+        "slim/psr7": "^1.6",
+        "php-http/guzzle7-adapter": "^1.0",
+        "open-telemetry/sdk": "^1.0",
+        "open-telemetry/opentelemetry-auto-slim": "^1.0@beta",
+        "grpc/grpc": "^1.57",
+        "open-telemetry/exporter-otlp": "^1.0",
+        "open-telemetry/transport-grpc": "^1.0",
+        "open-telemetry/opentelemetry-auto-psr15": "^1.0@beta",
+        "open-telemetry/opentelemetry-auto-psr18": "^1.0@beta",
+        "predis/predis": "^2.2"
+    },
+    "minimum-stability": "beta",
+    "config": {
+        "allow-plugins": {
+            "php-http/discovery": true
+        }
+
+    }
+    
+}
