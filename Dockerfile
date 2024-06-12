@@ -1,24 +1,45 @@
-FROM ubuntu:22.04 as php56
+FROM ubuntu:22.04
 
-RUN apt-get update && apt-get install -y libtool make gcc autoconf zlib1g-dev zip
+ENV DEBIAN_FRONTEND=noninteractive
+ENV COMPOSER_ALLOW_SUPERUSER=1
 
-RUN pecl install grpc opentelemetry-beta protobuf > /dev/null 
-
-RUN echo "\
-[opentelemetry]\
-extension=grpc.so\
-extension=opentelemetry.so\
-extension=protobuf.so" >> //usr/local/etc/php/php.ini
-
-
-FROM php:8.0 as php80
+RUN apt-get update && apt-get install -y \
+    git \
+    php \
+    php-mysql \
+    php-zip \
+    unzip \
+    curl \
+    gcc \
+    make \
+    autoconf \
+    php-dev \
+    php-pear \
+    libtool \
+    libz-dev \
+    zip
 
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-WORKDIR /php-slim
+WORKDIR /phpslim
 
 COPY . .
 
-EXPOSE 8000
+# Debugging commands
+# RUN ls -la             
+# RUN pwd               
+# RUN find /phpslim     
+# RUN cat composer.json
 
-CMD ["php", "-S", "0.0.0.0:8000", "public/index.php"]
+RUN composer install --no-dev --optimize-autoloader
+
+RUN pecl install grpc opentelemetry protobuf && \
+    echo "extension=grpc.so" > /etc/php/8.1/cli/conf.d/30-grpc.ini && \
+    echo "extension=opentelemetry.so" > /etc/php/8.1/cli/conf.d/30-opentelemetry.ini && \
+    echo "extension=protobuf.so" > /etc/php/8.1/cli/conf.d/30-protobuf.ini
+RUN composer config allow-plugins.php-http/discovery false
+RUN composer require guzzlehttp/psr7 php-http/guzzle7-adapter open-telemetry/sdk open-telemetry/exporter-otlp open-telemetry/opentelemetry-auto-laravel
+
+EXPOSE 80
+
+CMD ["php", "-S", "0.0.0.0:80", "-t", "public"]
