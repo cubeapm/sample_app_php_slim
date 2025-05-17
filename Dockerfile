@@ -3,7 +3,10 @@ FROM ubuntu:22.04
 ENV DEBIAN_FRONTEND=noninteractive
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
-RUN apt-get update && apt-get install -y git php php-redis php-mysql php-zip unzip curl zip
+# Install PHP
+RUN apt-get update && apt-get install -y software-properties-common
+RUN apt-add-repository ppa:ondrej/php -y
+RUN apt-get update && apt-get install -y --no-install-recommends unzip git php8.3 php8.3-cli php8.3-common php8.3-redis php8.3-mysql php8.3-zip php8.3-curl php8.3-xml
 
 # Install composer
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
@@ -14,7 +17,7 @@ RUN mv composer.phar /usr/local/bin/composer
 
 WORKDIR /phpslim
 
-COPY . .
+ADD . .
 
 RUN composer install --no-dev --optimize-autoloader
 
