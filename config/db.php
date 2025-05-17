@@ -1,16 +1,26 @@
 <?php
 
 class DB {
-    private $host = 'localhost';
-    private $user = 'root';
-    private $pass = 'root';
-    private $dbname = 'test1';
+    private $db;
 
     public function connect() {
-        $conn_str = "mysql:host=$this->host;dbname=$this->dbname";
-        $conn = new PDO($conn_str ,$this->user, $this->pass);
-        $conn->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_EXCEPTION);
+        $host = 'mysql'; // Docker container name
+        $dbname = 'test';
+        $user = 'root';
+        $pass = 'root';
 
-        return $conn;
+        $dsn = "mysql:host=$host;dbname=$dbname;charset=utf8mb4";
+        $options = [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_OBJ,
+        ];
+
+        $this->db = new PDO($dsn, $user, $pass, $options);
+        return $this->db;
+    }
+
+    public function select($query) {
+        $stmt = $this->connect()->query($query);
+        return $stmt->fetchAll();
     }
 }

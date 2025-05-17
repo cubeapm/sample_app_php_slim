@@ -9,7 +9,11 @@ use Predis\Client as RedisClient;
 require __DIR__ . "/../vendor/autoload.php";
 require_once __DIR__ . "/../config/db.php";
 
-$redis = new RedisClient();
+$redis = new RedisClient([
+    'scheme' => 'tcp',
+    'host' => 'redis',
+    'port' => 6379,
+]);
 
 $app = AppFactory::create();
 $app->addRoutingMiddleware();
@@ -17,6 +21,13 @@ $app->addRoutingMiddleware();
 $app->get('/', function (Request $request, Response $response, $args) {
     $response->getBody()->write("Hello");
     return $response;
+});
+
+$app->get('/param/{param}', function (Request $request, Response $response, array $args) {
+    $param = $args['param'];
+    $data = ['param' => $param];
+    $response->getBody()->write(json_encode($data));
+    return $response->withHeader('Content-Type', 'application/json');
 });
 
 $app->get('/exception', function (Request $request, Response $response, $args) {
@@ -31,30 +42,13 @@ $app->get('/redis', function (Request $request, Response $response, $args) use (
 });
 
 $app->get('/mysql', function (Request $request, Response $response) {
-    $sql = "SELECT * FROM friends";
+    $db = new DB();
+    $data = $db->select("SELECT * FROM user");
 
-    try {
-        $db = new DB();
-        $conn = $db->connect();
-
-        $stmt = $conn->query($sql);
-        $friends = $stmt->fetchAll(PDO::FETCH_OBJ);
-
-        $db = null;
-        $response->getBody()->write(json_encode($friends));
-        return $response
-            ->withHeader('content-type', 'application/json')
-            ->withStatus(200);
-    } catch (PDOException $e) {
-        $error = array(
-            "message" => $e->getMessage()
-        );
-
-        $response->getBody()->write(json_encode($error));
-        return $response
-            ->withHeader('content-type', 'application/json')
-            ->withStatus(500);
-    }
+    $response->getBody()->write(json_encode($data));
+    return $response
+        ->withHeader('Content-Type', 'application/json')
+        ->withStatus(200);
 });
 
 $errorMiddleware = $app->addErrorMiddleware(true, true, true);

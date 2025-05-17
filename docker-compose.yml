@@ -1,17 +1,9 @@
 version: '3'
 services:
-  web:
+  slim:
     build:
       context: . 
     container_name: cube_php_slim
-    environment:
-      - OTEL_PHP_AUTOLOAD_ENABLED=true
-      - OTEL_SERVICE_NAME=cube_php_slim
-      - OTEL_METRICS_EXPORTER=none
-      - OTEL_TRACES_EXPORTER=console
-      - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
-      # - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://localhost:4318/v1/traces
-      - OTEL_PROPAGATORS=baggage,tracecontext
     ports:
       - "8000:8000"  
   mysql:

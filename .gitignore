@@ -15,5 +15,5 @@ nbproject/
 cache.properties
 .php_cs.cache
 # Composer
-composer.phar
-composer.lock
+# composer.phar
+# composer.lock
