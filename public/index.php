@@ -30,6 +30,24 @@ $app->get('/param/{param}', function (Request $request, Response $response, arra
     return $response->withHeader('Content-Type', 'application/json');
 });
 
+$app->get('/api/{status}', function (Request $request, Response $response, array $args) {
+    $status = $args['status'];
+
+    $client = new Client();
+    $res = $client->get("http://localhost:8000/status/{$status}");
+
+    $response->getBody()->write(json_encode(['message' => 'API called']));
+    return $response->withHeader('Content-Type', 'application/json');
+});
+
+$app->get('/status/{status}', function (Request $request, Response $response, array $args) {
+    $status = (int)$args['status'];
+
+    $payload = json_encode(['message' => 'Status response']);
+    $response->getBody()->write($payload);
+    return $response->withStatus($status)->withHeader('Content-Type', 'application/json');
+});
+
 $app->get('/exception', function (Request $request, Response $response, $args) {
     throw new \Exception("Sample exception");
 });

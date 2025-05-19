@@ -5,8 +5,15 @@ services:
     build:
       context: . 
     container_name: cube_php_slim
+    environment:
+      - PHP_CLI_SERVER_WORKERS=4
     ports:
       - "8000:8000"  
+    depends_on:
+      - mysql
+      - redis
+    restart: always
+  
   mysql:
     image: mysql:8.0
     container_name: cube_php_slim_mysql
