@@ -6,6 +6,7 @@ services:
       context: . 
     container_name: cube_php_slim
     environment:
+      - PHP_CLI_SERVER_WORKERS=4
       - DD_SERVICE=cube_sample_app_php_slim_datadog
       # send traces to CubeAPM
       - DD_TRACE_AGENT_URL=http://host.docker.internal:3130
@@ -21,6 +22,11 @@ services:
       # - DD_TRACE_DEBUG=true
     ports:
       - "8000:8000"  
+    depends_on:
+      - mysql
+      - redis
+    restart: always
+  
   mysql:
     image: mysql:8.0
     container_name: cube_php_slim_mysql
