@@ -18,11 +18,6 @@ RUN php composer-setup.php
 RUN php -r "unlink('composer-setup.php');"
 RUN mv composer.phar /usr/local/bin/composer
 
-# Download and install the Datadog PHP tracer (inside container)
-RUN curl -LO https://github.com/DataDog/dd-trace-php/releases/latest/download/datadog-setup.php \
-  && php datadog-setup.php --php-bin php8.3 \
-  && rm datadog-setup.php
-
 
 WORKDIR /phpslim
 
