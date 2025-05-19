@@ -1,3 +1,26 @@
+# New Relic Instrumentation
+
+This branch contains code for New Relic instrumentation.
+
+CubeAPM works with New Relic agents as described in [using CubeAPM with New Relic agents](https://docs.cubeapm.com/instrumentation#using-cubeapm-with-new-relic-agents).
+
+For testing, **ngrok** can be used in place of load balancer. Run `ngrok http 3130` to create a tunnel and use the domain name provided by ngrok to set `NEW_RELIC_HOST=xxxx.ngrok-free.app` in [docker-compose.yml](docker-compose.yml).
+
+Refer the project README below for more details.
+
+## Troubleshooting
+
+If the app does not show up in CubeAPM after integration is done, add the below environment variables to check New Relic agent logs(the config file is generally available at /etc/php/<php_version>/mods-available/newrelic.ini).
+
+```shell
+newrelic.loglevel = "debug"
+# newrelic.logfile = "/var/log/newrelic/php_agent.log"
+
+newrelic.daemon.loglevel = "debug"
+# newrelic.daemon.logfile = "/var/log/newrelic/newrelic-daemon.log"
+
+```
+
 # Php slim Instrumentation
 
 This is a sample app to demonstrate how to instrument Php slim app with **Datadog**, **Elastic**, **New Relic** and **OpenTelemetry**. It contains source code for the Php app which interacts with various services like Redis, MySQL etc. to demonstrate tracing for these services. This repository has a docker compose file to set up all these services conveniently.

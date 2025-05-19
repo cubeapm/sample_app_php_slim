@@ -4,6 +4,9 @@ services:
     platform: linux/amd64
     build:
       context: . 
+      args:
+        # New Relic agent will send data on https://<domain_of_cubeapm_server>:443
+        NEW_RELIC_HOST: <domain_of_cubeapm_server>
     container_name: cube_php_slim
     ports:
       - "8000:8000"  
