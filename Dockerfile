@@ -1,7 +1,11 @@
 FROM ubuntu:22.04
 
-ENV DEBIAN_FRONTEND=noninteractive
+ARG DEBIAN_FRONTEND=noninteractive
+
 ENV COMPOSER_ALLOW_SUPERUSER=1
+
+# For dev
+RUN apt-get update && apt-get install -y vim curl
 
 # Install PHP
 RUN apt-get update && apt-get install -y software-properties-common

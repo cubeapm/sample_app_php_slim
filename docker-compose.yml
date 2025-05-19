@@ -1,6 +1,7 @@
 version: '3'
 services:
   slim:
+    platform: linux/amd64
     build:
       context: . 
     container_name: cube_php_slim
