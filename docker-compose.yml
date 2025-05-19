@@ -19,6 +19,11 @@ services:
       - OTEL_PROPAGATORS=baggage,tracecontext 
     ports:
       - "8000:8000"  
+    depends_on:
+      - mysql
+      - redis
+    restart: always
+  
   mysql:
     image: mysql:8.0
     container_name: cube_php_slim_mysql
