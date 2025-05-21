@@ -5,7 +5,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
 # For dev
-RUN apt-get update && apt-get install -y vim curl
+RUN apt-get update && apt-get install -y vim curl wget
 
 # Install PHP
 RUN apt-get update && apt-get install -y software-properties-common
@@ -17,6 +17,11 @@ RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
 RUN php composer-setup.php
 RUN php -r "unlink('composer-setup.php');"
 RUN mv composer.phar /usr/local/bin/composer
+
+# Install Elastic APM PHP Agent
+RUN wget https://github.com/elastic/apm-agent-php/releases/download/v1.15.0/apm-agent-php_1.15.0_amd64.deb && \
+    dpkg -i apm-agent-php_1.15.0_amd64.deb && \
+    rm apm-agent-php_1.15.0_amd64.deb
 
 
 WORKDIR /phpslim
