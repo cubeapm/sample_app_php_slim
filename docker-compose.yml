@@ -11,11 +11,11 @@ services:
       - OTEL_SERVICE_NAME=cube_sample_php_slim_otel
       - OTEL_EXPORTER_OTLP_COMPRESSION=gzip 
       - OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
-      - OTEL_TRACES_EXPORTER=otlp
       - OTEL_PHP_AUTOLOAD_ENABLED=true 
       - OTEL_PROPAGATORS=baggage,tracecontext 
 
       # print traces on console
+      - OTEL_TRACES_EXPORTER=console
       - OTEL_LOG_LEVEL=debug
       # send traces to CubeAPM
       # - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://host.docker.internal:4318/v1/traces 
