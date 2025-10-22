@@ -20,7 +20,7 @@ services:
       # send traces to CubeAPM
       # - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://host.docker.internal:4318/v1/traces 
     ports:
-      - "8000:8000"  
+      - "8000:80"  
     depends_on:
       - mysql
       - redis

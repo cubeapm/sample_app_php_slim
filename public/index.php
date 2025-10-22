@@ -34,7 +34,7 @@ $app->get('/api/{status}', function (Request $request, Response $response, array
     $status = $args['status'];
 
     $client = new Client();
-    $res = $client->get("http://localhost:8000/status/{$status}");
+    $res = $client->get("http://localhost/status/{$status}");
 
     $response->getBody()->write(json_encode(['message' => 'API called']));
     return $response->withHeader('Content-Type', 'application/json');
