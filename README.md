@@ -2,20 +2,21 @@
 
 This branch contains code for Datadog instrumentation.
 
-By default, hitting an API endpoint will generate a trace, which is sent to CubeAPM. This behavior is controlled via environment variables in [docker-compose.yml](docker-compose.yml).
+By default, hitting an API endpoint will generate a trace, which is sent to CubeAPM. This behavior is controlled via settings in [docker-compose.yml](docker-compose.yml) and [Dockerfile](Dockerfile).
 
 Refer the project README below for more details.
 
 ## Troubleshooting
 
-If the app does not show up in CubeAPM after integration is done, add the below environment variables to check Datadog tracer logs.
+If the app does not show up in CubeAPM after integration is done, add the below configuration in ddtrace.ini to check Datadog tracer logs.
 
 ```shell
-# Print Datadog tracer startup logs on screen
-DD_TRACE_STARTUP_LOGS=true
+# When enabled, sends debug logs to PHP's error_log instead of datadog.trace.log_file
+datadog.trace.debug = On
+datadog.trace.log_file = /var/log/php8.3-fpm.log
 
 # Enable Datadog tracer debug logging if needed to see detailed logs
-#DD_TRACE_DEBUG=true
+datadog.trace.log_level = debug
 ```
 
 ---
