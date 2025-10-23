@@ -8,6 +8,8 @@ services:
         # send traces to CubeAPM
         DD_TRACE_AGENT_URL: http://host.docker.internal:3130
     container_name: cube_php_slim
+    environment:
+      - PHP_CLI_SERVER_WORKERS=4
     ports:
       - "8000:80"  
     depends_on:
