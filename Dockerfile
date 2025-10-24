@@ -30,18 +30,19 @@ RUN wget https://github.com/elastic/apm-agent-php/releases/download/v1.15.0/apm-
     dpkg -i apm-agent-php_1.15.0_amd64.deb && \
     rm apm-agent-php_1.15.0_amd64.deb
 
-# Enable Elastic APM extension for both CLI and FPM
-RUN echo "extension=elastic_apm.so" > /etc/php/8.3/mods-available/elastic_apm.ini && \
-    echo "elastic_apm.bootstrap_php_part_file=/opt/elastic/apm-agent-php/src/bootstrap_php_part.php" >> /etc/php/8.3/mods-available/elastic_apm.ini && \
-    echo "elastic_apm.server_url=$ELASTIC_APM_SERVER_URL" >> /etc/php/8.3/mods-available/elastic_apm.ini && \
-    echo "elastic_apm.service_name=cube_sample_app_php_slim_elastic" >> /etc/php/8.3/mods-available/elastic_apm.ini && \
-    # optional settings
-    echo "elastic_apm.environment=UNSET" >> /etc/php/8.3/mods-available/elastic_apm.ini && \
-    echo "elastic_apm.service_version=1.2.3" >> /etc/php/8.3/mods-available/elastic_apm.ini && \
-    echo 'elastic_apm.global_labels="mykey1=myvalue1,mykey2=myvalue2"' >> /etc/php/8.3/mods-available/elastic_apm.ini && \
-    # Set Elastic agent log level to debug if needed to see detailed logs
-    echo "elastic_apm.log_level=debug" >> /etc/php/8.3/mods-available/elastic_apm.ini && \
-    phpenmod -v 8.3 -s ALL elastic_apm
+# Configure Elastic APM PHP Agent
+RUN sed -i 's|;elastic_apm.service_name = "REPLACE_WITH_SERVICE_NAME"|elastic_apm.service_name = "cube_sample_php_slim_elastic"|g' /opt/elastic/apm-agent-php/etc/elastic-apm-custom.ini
+RUN sed -i "s|;elastic_apm.server_url = \"http://localhost:8200\"|elastic_apm.server_url = \"$ELASTIC_APM_SERVER_URL\"|g" /opt/elastic/apm-agent-php/etc/elastic-apm-custom.ini
+
+# optional settings
+# RUN sed -i 's|;elastic_apm.environment = "production"|elastic_apm.environment = "UNSET"|g' /opt/elastic/apm-agent-php/etc/elastic-apm-custom.ini
+# RUN sed -i 's|;elastic_apm.service_version = "REPLACE_WITH_OUTPUT_FROM_git rev-parse HEAD"|elastic_apm.service_version = "1.2.3"|g' /opt/elastic/apm-agent-php/etc/elastic-apm-custom.ini
+# RUN grep -q '^elastic_apm.global_labels' /opt/elastic/apm-agent-php/etc/elastic-apm-custom.ini \
+#   && sed -i 's|^elastic_apm.global_labels.*|elastic_apm.global_labels = "mykey1=myvalue1,mykey2=myvalue2"|g' /opt/elastic/apm-agent-php/etc/elastic-apm-custom.ini \
+#   || echo 'elastic_apm.global_labels = "mykey1=myvalue1,mykey2=myvalue2"' >> /opt/elastic/apm-agent-php/etc/elastic-apm-custom.ini
+
+# Set Elastic agent log level to debug if needed to see detailed logs
+RUN sed -i 's|;elastic_apm.log_level = "INFO"|elastic_apm.log_level = "DEBUG"|g' /opt/elastic/apm-agent-php/etc/elastic-apm-custom.ini
 
 WORKDIR /phpslim
 
