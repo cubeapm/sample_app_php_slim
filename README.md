@@ -2,7 +2,7 @@
 
 This branch contains code for OpenTelemetry instrumentation.
 
-Hitting an API endpoint will generate the corresponding traces. Traces are printed to console (where docker compose is running) by default. If you want to send traces to a backend tool, comment out the `OTEL_TRACES_EXPORTER=console` line and uncomment the `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT` line in [docker-compose.yml](docker-compose.yml).
+Hitting an API endpoint will generate the corresponding traces. Traces are printed to console by default. If you want to send traces to a backend tool, you can configure this behavior through the via settings in [docker-compose.yml](docker-compose.yml) and [Dockerfile](Dockerfile).
 
 Refer the project README below for more details.
 
