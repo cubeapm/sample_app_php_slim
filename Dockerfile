@@ -46,6 +46,8 @@ RUN { \
     echo 'env[OTEL_EXPORTER_OTLP_PROTOCOL] = "http/protobuf"'; \
     echo 'env[OTEL_PHP_AUTOLOAD_ENABLED] = "true"'; \
     echo 'env[OTEL_PROPAGATORS] = "baggage,tracecontext"'; \
+    # optional settings
+    echo 'env[OTEL_RESOURCE_ATTRIBUTES] = "cube.environment=UNSET,service.version=1.2.3,mykey1=myvalue1,mykey2=myvalue2"'; \
     # print traces to this file location /var/log/php8.3-fpm.log
     echo 'env[OTEL_TRACES_EXPORTER] = "console"'; \
     echo 'env[OTEL_LOG_LEVEL] = "debug"'; \
