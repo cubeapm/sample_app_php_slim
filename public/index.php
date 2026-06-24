@@ -9,6 +9,17 @@ use Predis\Client as RedisClient;
 require __DIR__ . "/../vendor/autoload.php";
 require_once __DIR__ . "/../config/db.php";
 
+// Custom Instrumentation Example based on Datadog docs
+if (extension_loaded('ddtrace')) {
+    \DDTrace\trace_method('DB', 'select', function (\DDTrace\SpanData $span, array $args) {
+        $span->name = 'custom.db.select';
+        $span->resource = 'DB.select';
+        if (isset($args[0])) {
+            $span->meta['custom.query'] = $args[0];
+        }
+    });
+}
+
 $redis = new RedisClient([
     'scheme' => 'tcp',
     'host' => 'redis',

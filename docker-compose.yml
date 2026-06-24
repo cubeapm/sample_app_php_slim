@@ -5,8 +5,10 @@ services:
     build:
       context: . 
       args:
-        # send traces to CubeAPM
-        DD_TRACE_AGENT_URL: http://host.docker.internal:3130
+        # send traces directly to CubeAPM
+        # DD_TRACE_AGENT_URL: http://host.docker.internal:3130
+        
+        DD_AGENT_HOST: datadog-agent
     container_name: cube_php_slim
     environment:
       - PHP_CLI_SERVER_WORKERS=4
@@ -16,6 +18,34 @@ services:
       - mysql
       - redis
     restart: always
+
+  datadog-agent:
+    image: gcr.io/datadoghq/agent:7
+    container_name: cube_php_laravel_datadog_agent
+    environment:
+      - DD_API_KEY=your_datadog_api_key_here
+      # Send runtime metrics to CubeAPM
+      - DD_DD_URL=http://host.docker.internal:3130
+      # Send traces to CubeAPM
+      - DD_APM_DD_URL=http://host.docker.internal:3130
+      # Send logs to CubeAPM
+      - DD_LOGS_CONFIG_LOGS_DD_URL=host.docker.internal:3130
+      - DD_LOGS_ENABLED=true
+      - DD_LOGS_INJECTION=true
+      - DD_LOGS_CONFIG_USE_HTTP=true
+      - DD_LOGS_CONFIG_LOGS_NO_SSL=true
+      - DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL=true
+      # Accept traces and metrics from applications
+      - DD_APM_ENABLED=true
+      - DD_APM_NON_LOCAL_TRAFFIC=true
+      - DD_DOGSTATSD_NON_LOCAL_TRAFFIC=true
+    ports:
+      - "8126:8126"
+      - "8125:8125/udp"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /proc/:/host/proc/:ro
+      - /sys/fs/cgroup/:/host/sys/fs/cgroup:ro
   
   mysql:
     image: mysql:8.0

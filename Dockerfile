@@ -3,7 +3,9 @@ FROM ubuntu:22.04
 ARG DEBIAN_FRONTEND=noninteractive
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
-ARG DD_TRACE_AGENT_URL=""
+# ARG DD_TRACE_AGENT_URL=""
+ARG DD_AGENT_HOST=""
+ARG DD_DOGSTATSD_URL=""
 
 RUN apt-get update && apt-get install -y vim curl
 
@@ -20,46 +22,50 @@ RUN mkdir -p /run/php
 
 # Install Composer
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
- && php composer-setup.php \
- && php -r "unlink('composer-setup.php');" \
- && mv composer.phar /usr/local/bin/composer
+    && php composer-setup.php \
+    && php -r "unlink('composer-setup.php');" \
+    && mv composer.phar /usr/local/bin/composer
 
 # Download and install the Datadog PHP tracer (inside container)
 RUN curl -LO https://github.com/DataDog/dd-trace-php/releases/latest/download/datadog-setup.php \
-  && php datadog-setup.php --php-bin=all \
-  && rm datadog-setup.php
+    && php datadog-setup.php --php-bin=all \
+    && rm datadog-setup.php
 
 # Update datadog configuration for both CLI and FPM
 # For CLI
 RUN sed -i \
-    -e "s|^;datadog.trace.agent_url.*|datadog.trace.agent_url = ${DD_TRACE_AGENT_URL}|" \
+    # -e "s|^;datadog.trace.agent_url.*|datadog.trace.agent_url = ${DD_TRACE_AGENT_URL}|" \
     -e "s|^;datadog.service.*|datadog.service = cube_sample_app_php_slim_datadog_cli|" \
-# optional settings
+    # optional settings
     # -e "s|^;datadog.env.*|datadog.env = myenv|" \
     # -e "s|^;datadog.version.*|datadog.version = 1.2.3|" \
     # -e "s|^;datadog.tags.*|datadog.tags = mykey1:myvalue1,mykey2:myvalue2|" \
-# When enabled, sends debug logs to PHP's error_log instead of datadog.trace.log_file
+    # When enabled, sends debug logs to PHP's error_log instead of datadog.trace.log_file
     -e "s|^;datadog.trace.debug.*|datadog.trace.debug = On|" \
-# Enable Datadog tracer debug logging if needed to see detailed log 
+    # Enable Datadog tracer debug logging if needed to see detailed log 
     -e "s|^;datadog.trace.log_level.*|datadog.trace.log_level = debug|" \
     /etc/php/8.3/cli/conf.d/98-ddtrace.ini \
- && grep -q "datadog.trace.log_file" /etc/php/8.3/cli/conf.d/98-ddtrace.ini || \
+    && echo "datadog.agent_host = ${DD_AGENT_HOST}" >> /etc/php/8.3/cli/conf.d/98-ddtrace.ini \
+    && echo "datadog.dogstatsd_url = ${DD_DOGSTATSD_URL}" >> /etc/php/8.3/cli/conf.d/98-ddtrace.ini \
+    && grep -q "datadog.trace.log_file" /etc/php/8.3/cli/conf.d/98-ddtrace.ini || \
     echo 'datadog.trace.log_file = /var/log/php8.3-cli.log' >> /etc/php/8.3/cli/conf.d/98-ddtrace.ini
 
 # For FPM
 RUN sed -i \
-    -e "s|^;datadog.trace.agent_url.*|datadog.trace.agent_url = ${DD_TRACE_AGENT_URL}|" \
+    # -e "s|^;datadog.trace.agent_url.*|datadog.trace.agent_url = ${DD_TRACE_AGENT_URL}|" \
     -e "s|^;datadog.service.*|datadog.service = cube_sample_app_php_slim_datadog_fpm|" \
-# optional settings
+    # optional settings
     # -e "s|^;datadog.env.*|datadog.env = myenv|" \
     # -e "s|^;datadog.version.*|datadog.version = 1.2.3|" \
     # -e "s|^;datadog.tags.*|datadog.tags = mykey1:myvalue1,mykey2:myvalue2|" \
-# When enabled, sends debug logs to PHP's error_log instead of datadog.trace.log_file
+    # When enabled, sends debug logs to PHP's error_log instead of datadog.trace.log_file
     -e "s|^;datadog.trace.debug.*|datadog.trace.debug = On|" \
-# Enable Datadog tracer debug logging if needed to see detailed log 
+    # Enable Datadog tracer debug logging if needed to see detailed log 
     -e "s|^;datadog.trace.log_level.*|datadog.trace.log_level = debug|" \
     /etc/php/8.3/fpm/conf.d/98-ddtrace.ini \
- && grep -q "datadog.trace.log_file" /etc/php/8.3/fpm/conf.d/98-ddtrace.ini || \
+    && echo "datadog.agent_host = ${DD_AGENT_HOST}" >> /etc/php/8.3/fpm/conf.d/98-ddtrace.ini \
+    && echo "datadog.dogstatsd_url = ${DD_DOGSTATSD_URL}" >> /etc/php/8.3/fpm/conf.d/98-ddtrace.ini \
+    && grep -q "datadog.trace.log_file" /etc/php/8.3/fpm/conf.d/98-ddtrace.ini || \
     echo 'datadog.trace.log_file = /var/log/php8.3-fpm.log' >> /etc/php/8.3/fpm/conf.d/98-ddtrace.ini
 
 WORKDIR /phpslim
